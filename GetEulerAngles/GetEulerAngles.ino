@@ -1,26 +1,34 @@
-// Accelerometer ADXL345
 #include <Wire.h> // I2C library, gyroscope
+#include <math.h>
+// Accelerometer ADXL345
 #define ACC (0xA7>>1)    //ADXL345 ACC address
 const int Xcorrection = 0;    //Determine these by zeroing their values when they are not the axis measuring gravity
 const int Ycorrection = 271;
 const int Zcorrection = -906;
+float Roll,Pitch;
+
 void setup(){
 Serial.begin(115200);
 Wire.begin();
 initAcc();
 }
-
 void loop(){
 int hx,hy,hz;
 int acc[3];
 getAccelerometerData(acc);
-hx = acc[0];
+hz = acc[0];
 hy = acc[1];
-hz = acc[2];
+hx = acc[2];
 
-Serial.print(" X="); Serial.print(hx);
-Serial.print(" Y="); Serial.print(hy);
-Serial.print(" Z="); Serial.print(hz);
+float R   = sqrt(pow(hx,2)+pow(hy,2)+pow(hz,2));
+Roll = -atan2(hx/R, hz/R)*180/M_PI;
+Pitch = -atan2(hy/R, hz/R)*180/M_PI;
+
+Serial.print(" X=");
+Serial.print(Roll);
+Serial.print(" Y=");
+Serial.print(Pitch);
+
 Serial.println(" ");
 delay(50); 
 }
@@ -71,5 +79,4 @@ while(Wire.available())    //ACC may send less than requested (abnormal)
   }
 Wire.endTransmission(); //end transmission
 }
-
 
